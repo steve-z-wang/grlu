@@ -1,0 +1,15 @@
+{
+    "model": {
+        "layer_sizes": [784, 256, 10]
+    },
+    "training": {
+        "epochs": 50,
+        "batch_size": 1,
+        "n_perturbations": 1,
+        "noise_max": 0.1,
+        "noise_min": 0.0,
+        "lr_max": 0.1,
+        "lr_min": 0.0,
+        "seed": 42
+    }
+}

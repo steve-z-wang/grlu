@@ -1,0 +1,12 @@
+{
+    "model": {
+        "layer_sizes": [784, 256, 10]
+    },
+    "training": {
+        "epochs": 50,
+        "batch_size": 256,
+        "lr_max": 0.1,
+        "lr_min": 0.0,
+        "seed": 42
+    }
+}
