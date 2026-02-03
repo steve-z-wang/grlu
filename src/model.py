@@ -29,7 +29,7 @@ def init_params(layer_sizes, seed=42):
 
 
 def forward(params, X, noises=None):
-    """Forward pass through network.
+    """Forward pass through network with residual connections.
 
     Args:
         params: List of (W, b) tuples
@@ -43,20 +43,23 @@ def forward(params, X, noises=None):
     activations = []
     for i, (W, b) in enumerate(params):
         # Layer norm
-        X = (X - X.mean(axis=1, keepdims=True)) / (X.std(axis=1, keepdims=True) + 1e-8)
-        act_input = X
+        X_norm = (X - X.mean(axis=1, keepdims=True)) / (X.std(axis=1, keepdims=True) + 1e-8)
+        act_input = X_norm
 
         # Linear
-        Z = X @ W.T + b
-
-        # Add noise before activation
-        if noises is not None:
-            Z = Z + noises[i]
+        Z = X_norm @ W.T + b
 
         # Activation (ReLU for hidden, none for output)
         if i < len(params) - 1:
-            X = jnp.maximum(0, Z)
+            out = jnp.maximum(0, Z)
+            # Add noise after activation
+            if noises is not None:
+                out = out + noises[i]
+            X = out
         else:
+            # Output layer
+            if noises is not None:
+                Z = Z + noises[i]
             X = Z
 
         activations.append((act_input, X if i < len(params) - 1 else None))
