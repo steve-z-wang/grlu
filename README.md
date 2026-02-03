@@ -64,6 +64,22 @@ This mirrors biological learning:
 - Autoencoder = visual cortex (slow, offline optimization)
 - Hebbian layer = hippocampus (fast, online association learning)
 
+## Related Work
+
+Our findings align with **Complementary Learning Systems (CLS)** theory from cognitive neuroscience:
+
+| System | Brain Region | Learning | Representations |
+|--------|-------------|----------|-----------------|
+| Slow | Neocortex | Gradual, statistical | Overlapping, distributed |
+| Fast | Hippocampus | Rapid, episodic | Sparse, separated |
+
+**Key papers:**
+- [Why There Are Complementary Learning Systems (McClelland et al., 1995)](https://stanford.edu/~jlmcc/papers/McCMcNaughtonOReilly95.pdf) - Foundational CLS theory
+- [Complementary Learning Systems (2011)](https://pubmed.ncbi.nlm.nih.gov/22141588/) - Updated framework
+- [Hybrid Neural Networks for Continual Learning (2025)](https://www.nature.com/articles/s41467-025-56405-9) - Recent work combining ANNs with spiking networks inspired by corticohippocampal circuits
+
+The CLS theory suggests that a single learning algorithm cannot efficiently do both feature extraction and fast memory formation - exactly what we observed with GRLU struggling on deep networks but working well as a shallow associative learner.
+
 ## Usage
 
 ```bash
