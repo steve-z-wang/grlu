@@ -75,6 +75,8 @@ This mirrors biological learning:
 - Autoencoder = visual cortex (slow, offline optimization)
 - Hebbian layer = hippocampus (fast, online association learning)
 
+**See [slow-fast-learn](https://github.com/steve-z-wang/slow-fast-learn)** for an implementation of this hybrid approach.
+
 ## Related Work
 
 Our findings align with **Complementary Learning Systems (CLS)** theory from cognitive neuroscience:
