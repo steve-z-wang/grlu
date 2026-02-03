@@ -36,7 +36,7 @@ def load_config(config_path):
 
 
 @partial(jax.jit, static_argnums=(6,))
-def grlu_step(params, X, y, key, noise_scale, lr, n_perturbations):
+def grlu_step(params, X, y, key, noise_scale, lr, n_perturbations, k=None):
     """
     Single GRLU training step with multiple perturbations.
 
@@ -60,8 +60,9 @@ def grlu_step(params, X, y, key, noise_scale, lr, n_perturbations):
         noises.append(noise)
 
     # Antithetic sampling: +noise and -noise
-    logits_pos, activations_pos = forward(params, X_tiled, noises)
-    logits_neg, activations_neg = forward(params, X_tiled, [-n for n in noises])
+    key, subkey = jax.random.split(key)
+    logits_pos, activations_pos, _ = forward(params, X_tiled, noises, k, subkey)
+    logits_neg, activations_neg, _ = forward(params, X_tiled, [-n for n in noises], k, subkey)
 
     # Per-sample rewards (negative cross-entropy)
     logits_pos_stable = logits_pos - logits_pos.max(axis=1, keepdims=True)
@@ -106,6 +107,7 @@ def train(config, output_dir=None):
     noise_min = config['training']['noise_min']
     lr_max = config['training']['lr_max']
     lr_min = config['training']['lr_min']
+    k = config['training'].get('k', None)  # None = ReLU, float = top-k
     seed = config['training']['seed']
 
     key = jax.random.PRNGKey(seed)
@@ -117,7 +119,8 @@ def train(config, output_dir=None):
 
     # Initialize params
     params = init_params(layer_sizes, seed=seed)
-    print(f"Model: {' -> '.join(map(str, layer_sizes))} | Perturbations: {n_perturbations}")
+    activation = f"top-k={k}" if k else "ReLU"
+    print(f"Model: {' -> '.join(map(str, layer_sizes))} | {activation} | Perturbations: {n_perturbations}")
 
     n_batches = len(X_train) // batch_size
 
@@ -142,18 +145,19 @@ def train(config, output_dir=None):
             X_batch = X_shuffled[start:end]
             y_batch = y_shuffled[start:end]
 
+            k_val = jnp.array(k) if k else None
             params, reward, key = grlu_step(
                 params, X_batch, y_batch, key,
-                jnp.array(noise_scale), jnp.array(lr), n_perturbations
+                jnp.array(noise_scale), jnp.array(lr), n_perturbations, k_val
             )
             total_reward += float(reward)
             pbar.set_postfix(reward=f"{total_reward / (batch_idx + 1):.4f}")
 
         # Evaluate
-        train_acc = compute_accuracy(params, X_train[:1000], y_train[:1000])
-        test_acc = compute_accuracy(params, X_test, y_test)
-        sparsities = compute_sparsity(params, X_test[:1000])
-        sparsity_str = " | ".join([f"L{i+1}: {s:.0%}" for i, s in enumerate(sparsities)])
+        train_acc = compute_accuracy(params, X_train[:1000], y_train[:1000], k)
+        test_acc = compute_accuracy(params, X_test, y_test, k)
+        sparsities = compute_sparsity(params, X_test[:1000], k)
+        sparsity_str = " | ".join([f"L{i+1} sparsity: {s:.0%}" for i, s in enumerate(sparsities)])
         print(f"Epoch {epoch + 1:3d} | Train: {train_acc:.4f} | Test: {test_acc:.4f} | {sparsity_str}")
 
     # Save model
