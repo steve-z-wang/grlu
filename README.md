@@ -24,8 +24,9 @@ On MNIST with architecture 784 → 256 → 10 (10 epochs, batch size 1):
 |---------------|---------------|-------|
 | 1 | ~90% | More biologically plausible (single trial) |
 | 16 | 92.83% | Multiple samples reduce variance |
+| 128 | ~98% | High sample count approaches gradient quality |
 
-The single-perturbation result is more interesting from a biological perspective - the brain doesn't average over 16 parallel perturbations.
+The single-perturbation result is more interesting from a biological perspective - the brain doesn't average over 128 parallel perturbations. Higher perturbation counts essentially approximate the gradient, losing biological plausibility.
 
 See `experiments/exp-1/configs.md` for detailed results.
 
