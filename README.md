@@ -52,6 +52,15 @@ GRLU struggles with deep networks because it lacks a mechanism to assign credit 
 
 A single algorithm cannot do both. Hebbian/GRLU is suited for fast learning on top of a pre-trained feature space, not for learning features from scratch.
 
+**Key insight:** Biology uses neither backprop for either system:
+
+| System | Biological Algorithm | Timescale |
+|--------|---------------------|-----------|
+| Feature extraction (vision) | **Evolution / ES** | Millions of years |
+| Fast memory (hippocampus) | **Hebbian** | Milliseconds |
+
+Evolution is essentially ES - random mutations (noise) + selection pressure (reward). The visual cortex was optimized this way over evolutionary time, then Hebbian learning handles fast online adaptation. A fully bio-plausible system could use ES for feature learning + Hebbian for fast association - no backprop anywhere.
+
 ## Future Direction
 
 A hybrid approach:
