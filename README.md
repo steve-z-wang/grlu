@@ -9,11 +9,33 @@ GRLU uses noise perturbations and reward correlation to update weights locally:
 1. Forward pass with noise added to neuron outputs
 2. Compute reward (negative cross-entropy loss)
 3. Use antithetic sampling: compare +noise vs -noise outcomes
-4. Update weights: `delta_W = noise * reward_diff * input`
+4. Update weights: `ΔW = input × noise × reward_diff`
+
+### Connection to Hebbian Learning
+
+GRLU is a form of **differential Hebbian learning** (also called covariance learning):
+
+```
+Traditional Hebbian:    ΔW = pre × post × reward
+GRLU (differential):    ΔW = pre × Δpost × reward
+```
+
+Where:
+- `pre` = input (pre-synaptic activity)
+- `Δpost` = noise (the change in post-synaptic activity we tried)
+- `reward` = reward_diff (did that change improve performance?)
+
+Instead of learning from absolute activations (`pre × post`), GRLU learns from **changes** in activations (`pre × Δpost`). The noise represents "what if we changed the output this way?" and reward_diff tells us "was that change good?"
+
+This is biologically plausible:
+- Synapses don't know absolute firing rates, but can detect changes
+- Dopamine (reward signal) modulates plasticity based on outcome
+- Exploration through neural noise is observed in biological systems
 
 Key features:
 - **No backpropagation** - gradients don't flow backwards
 - **Local learning rule** - each layer updates based on local information + global reward
+- **Hebbian core** - `pre × Δpost` correlation gated by reward
 - **Biologically plausible** - similar to how dopamine modulates synaptic plasticity
 
 ## Results
